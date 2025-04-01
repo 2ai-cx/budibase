@@ -24,6 +24,12 @@ async function fetchToken(config: {
 }) {
   config = await processEnvironmentVariable(config)
 
+  const allowedUrls = ["https://example.com", "https://api.example.com"];
+  const url = new URL(config.url);
+  if (!allowedUrls.includes(url.origin)) {
+    throw new Error("Invalid URL");
+  }
+
   const fetchConfig: RequestInit = {
     method: "POST",
     headers: {
