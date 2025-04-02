@@ -26,6 +26,13 @@ async function redirect(
 ) {
   const { devPath } = ctx.params
   const queryString = ctx.originalUrl.split("?")[1] || ""
+  
+  // Allow-list of acceptable devPath values
+  const allowedPaths = ["path1", "path2", "path3"]
+  if (!allowedPaths.includes(devPath)) {
+    ctx.throw(400, "Invalid path")
+  }
+  
   const response = await fetch(
     checkSlashesInUrl(
       `${env.WORKER_URL}/api/${path}/${devPath}?${queryString}`
