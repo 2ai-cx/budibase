@@ -544,6 +544,12 @@ export async function downloadTarball(
   bucketName: string,
   path: string
 ) {
+  const allowedDomains = ["example.com", "another-example.com"]; // Add allowed domains here
+  const urlObj = new URL(url);
+  if (!allowedDomains.includes(urlObj.hostname)) {
+    throw new Error(`URL domain not allowed: ${urlObj.hostname}`);
+  }
+
   bucketName = sanitizeBucket(bucketName)
   path = sanitizeKey(path)
   const response = await fetch(url)
