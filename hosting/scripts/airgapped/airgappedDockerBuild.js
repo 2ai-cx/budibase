@@ -1,5 +1,5 @@
 const fs = require("fs")
-const { execSync } = require("child_process")
+const { execFileSync } = require("child_process")
 const path = require("path")
 
 const IS_SINGLE_IMAGE = process.env.SINGLE_IMAGE
@@ -42,7 +42,7 @@ fs.mkdirSync(OUTPUT_DIR)
 // package images into tar files
 for (let image in IMAGES) {
 	console.log(`Creating tar for ${image}..`)
-	execSync(`docker save ${IMAGES[image]} -o ${OUTPUT_DIR}/${image}.tar`)
+	execFileSync("docker", ["save", IMAGES[image], "-o", path.join(OUTPUT_DIR, `${image}.tar`)])
 }
 
 // copy config files
@@ -52,4 +52,4 @@ if (!IS_SINGLE_IMAGE) {
 copyFile(FILES.ENV)
 
 // compress
-execSync(`tar -czf bb-airgapped.tar.gz hosting/scripts/bb-airgapped`)
+execFileSync("tar", ["-czf", "bb-airgapped.tar.gz", "hosting/scripts/bb-airgapped"])
