@@ -8,22 +8,22 @@ import fetch from "node-fetch"
 import { join } from "path"
 import { downloadUnzipTarball } from "./utils"
 
+const ALLOWED_BASE_URLS = [
+  "https://www.npmjs.com/package/",
+  "https://registry.npmjs.org/"
+];
+
 export async function npmUpload(url: string, name: string, headers = {}) {
   let npmTarballUrl = url
   let pluginName = name
 
-  if (
-    !npmTarballUrl.includes("https://www.npmjs.com") &&
-    !npmTarballUrl.includes("https://registry.npmjs.org")
-  ) {
+  const isValidBaseUrl = ALLOWED_BASE_URLS.some(baseUrl => npmTarballUrl.startsWith(baseUrl));
+  if (!isValidBaseUrl) {
     throw new Error("The plugin origin must be from NPM")
   }
 
   if (!npmTarballUrl.includes(".tgz")) {
-    const npmPackageURl = url.replace(
-      "https://www.npmjs.com/package/",
-      "https://registry.npmjs.org/"
-    )
+    const npmPackageURl = new URL("/" + url.split("/").slice(4).join("/"), "https://registry.npmjs.org/").toString();
     const response = await fetch(npmPackageURl)
     if (response.status !== 200) {
       throw new Error("NPM Package not found")
