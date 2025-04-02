@@ -1,6 +1,7 @@
 import { generateMetadataID } from "../../db/utils"
 import { saveEntityMetadata, deleteEntityMetadata } from "../../utilities"
 import { context } from "@budibase/backend-core"
+import xss from "xss"
 import {
   UserCtx,
   MetadataType,
@@ -24,7 +25,8 @@ export async function saveMetadata(
   if (type === MetadataType.AUTOMATION_TEST_HISTORY) {
     ctx.throw(400, "Cannot save automation history type")
   }
-  ctx.body = await saveEntityMetadata(type, entityId, ctx.request.body)
+  const sanitizedBody = xss(ctx.request.body)
+  ctx.body = await saveEntityMetadata(type, entityId, sanitizedBody)
 }
 
 export async function deleteMetadata(
