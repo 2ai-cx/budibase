@@ -18,10 +18,21 @@ import sdk from "../../../sdk"
 import { ensureQueryUISet } from "../views/utils"
 import { isV2 } from "../views"
 
+function sanitizeTable(table: Table): Table {
+  const forbiddenKeys = ["__proto__", "constructor", "prototype"];
+  for (const key of forbiddenKeys) {
+    if (key in table) {
+      delete table[key];
+    }
+  }
+  return table;
+}
+
 export async function processTable(table: Table): Promise<Table> {
   if (!table) {
     return table
   }
+  table = sanitizeTable(table);
 
   table = { ...table }
   if (table.views) {
@@ -101,7 +112,8 @@ export async function getExternalTable(
   if (!entities[tableName]) {
     throw new Error(`Unable to find table named "${tableName}"`)
   }
-  const table = await processTable(entities[tableName])
+  let table = await processTable(entities[tableName])
+  table = sanitizeTable(table);
   if (!table.sourceId) {
     table.sourceId = datasourceId
   }
