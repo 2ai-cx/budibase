@@ -23,7 +23,12 @@ export async function npmUpload(url: string, name: string, headers = {}) {
   }
 
   if (!npmTarballUrl.includes(".tgz")) {
-    const npmPackageURl = new URL("/" + url.split("/").slice(4).join("/"), "https://registry.npmjs.org/").toString();
+    const allowedPaths = ["/", "/-/"];
+    const path = "/" + url.split("/").slice(4).join("/");
+    if (!allowedPaths.some(allowedPath => path.startsWith(allowedPath))) {
+      throw new Error("Invalid NPM package path");
+    }
+    const npmPackageURl = new URL(path, "https://registry.npmjs.org/").toString();
     const response = await fetch(npmPackageURl)
     if (response.status !== 200) {
       throw new Error("NPM Package not found")
