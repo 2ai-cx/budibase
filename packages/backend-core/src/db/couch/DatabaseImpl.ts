@@ -320,6 +320,7 @@ export class DatabaseImpl implements Database {
     }
     return this.performCallWithDBCreation(async db => {
       if (!document.createdAt) {
+        document = Object.create(null, Object.getOwnPropertyDescriptors(document));
         document.createdAt = new Date().toISOString()
       }
       document.updatedAt = new Date().toISOString()
