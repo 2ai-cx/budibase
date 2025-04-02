@@ -2,6 +2,11 @@ import { getPluginMetadata } from "../../../utilities/fileSystem"
 import fetch from "node-fetch"
 import { downloadUnzipTarball } from "./utils"
 
+function isValidGithubUrl(url: string): boolean {
+  const githubUrlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+$/;
+  return githubUrlPattern.test(url);
+}
+
 export async function request(
   url: string,
   headers: { [key: string]: string },
@@ -16,6 +21,9 @@ export async function request(
 }
 
 export async function githubUpload(url: string, name = "", token = "") {
+  if (!isValidGithubUrl(url)) {
+    throw new Error("Invalid GitHub repository URL")
+  }
   let githubUrl = url
 
   if (!githubUrl.includes("https://github.com/")) {
